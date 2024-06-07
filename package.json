@@ -1,0 +1,18 @@
+{
+  "type": "module",
+  "scripts": {
+    "format": "prettier -w .",
+    "build": "npm run build -w wasm_exec2 && npm run build -w gort0-js-wasm",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.1",
+    "vitepress": "^1.2.3",
+    "vue": "^3.4.27"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
+}
