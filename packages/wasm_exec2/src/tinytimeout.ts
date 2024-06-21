@@ -3,28 +3,36 @@ declare global {
   var clearTimeout: ((id: number) => void) | undefined;
 }
 
+let pollPromise = null;
 let nextId = 1;
 // @ts-ignore
 const fns: Record<number, () => void> = { __proto__: null! };
+// @ts-ignore
+const startTimes: Record<number, number> = { __proto__: null! };
 function setTimeoutImpl(f: () => void, ms: number) {
   const id = nextId++;
   fns[id] = f;
-  void asyncSpin(id, ms);
+  startTimes[id] = Date.now();
+  if (!pollPromise) {
+    pollPromise = poll();
+    void pollPromise.then(() => {
+      pollPromise = null;
+    });
+  }
   return id;
 }
-async function asyncSpin(id: number, ms: number) {
-  const start = Date.now();
-  while (true) {
+async function poll() {
+  for (let ids = Object.keys(fns); ids.length; ids = Object.keys(fns)) {
     await Promise.resolve();
-    if (!(id in fns)) {
-      return;
-    }
-    const dur = Date.now() - start;
-    if (dur >= ms) {
-      const f = fns[id];
-      delete fns[id];
-      f();
-      return;
+    for (const id of ids) {
+      const start = startTimes[id];
+      const dur = Date.now() - start;
+      if (dur >= ms) {
+        const f = fns[id];
+        delete fns[id];
+        delete startTimes[id];
+        f();
+      }
     }
   }
 }
