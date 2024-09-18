@@ -16,16 +16,13 @@ func Sys() Value {
 	return jsGo
 }
 
-func Import(specifier any, args ...any) Value {
-	if len(args) > 1 {
-		panic("syscall/js.Import: too many spread arguments. expected <=1.")
-	}
-	args2 := append([]any{specifier}, args...)
-	return jsGo.Call("_import", args2...)
+func Import(specifier any, options any) Value {
+	return Sys().Call("_import", specifier, options)
 }
 
+// Get the wasm_exec2 module's import.meta object. Panics if not running in an ESM environment.
 func ImportMeta() Value {
-	jsImportMeta := jsGo.Get("_importMeta")
+	jsImportMeta := Sys().Get("_importMeta")
 	if jsImportMeta.IsUndefined() {
 		panic(ValueError{
 			Method: "get _importMeta",
@@ -35,25 +32,30 @@ func ImportMeta() Value {
 	return jsImportMeta
 }
 
-var jsPromise Value
-
+// Waits for a JavaScript Promise or thenable to resolve. Panics on rejection.
 func Await(v Value) Value {
-	if jsPromise.IsUndefined() {
-		jsPromise = Global().Get("Promise")
+	// This code doesn't quite follow the Promises/A+ specification.
+	// https://promisesaplus.com/#the-promise-resolution-procedure
+	if v.Type() == TypeObject || v.Type() == TypeFunction {
+		if v.Get("then").Type() == TypeFunction {
+			channel := make(chan Value)
+			jsHandleResolve := FuncOf(func(this Value, args []Value) any {
+				channel <- args[0]
+				close(channel)
+				return Value{}
+			})
+			defer jsHandleResolve.Release()
+			jsHandleReject := FuncOf(func(this Value, args []Value) any {
+				close(channel)
+				panic(Error{Value: args[0]})
+			})
+			defer jsHandleReject.Release()
+			v.Call("then", jsHandleResolve, jsHandleReject)
+			return <-channel
+		} else {
+			return v
+		}
+	} else {
+		return v
 	}
-	jsP := jsPromise.Call("resolve", v)
-	channel := make(chan Value)
-	jsHandleResolve := FuncOf(func(this Value, args []Value) any {
-		channel <- args[0]
-		close(channel)
-		return Value{}
-	})
-	defer jsHandleResolve.Release()
-	jsHandleReject := FuncOf(func(this Value, args []Value) any {
-		close(channel)
-		panic(Error{Value: args[0]})
-	})
-	defer jsHandleReject.Release()
-	jsP.Call("then", jsHandleResolve, jsHandleReject)
-	return  <-channel
 }
