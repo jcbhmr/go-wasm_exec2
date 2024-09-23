@@ -1,4 +1,13 @@
-import { throw_, createENOSYS } from "./utils.js";
+// Can't wait for throw expressions!
+// https://github.com/tc39/proposal-throw-expressions
+const throw_ = (error) => { throw error; };
+
+function createENOSYS() {
+  const e = new Error("ENOSYS: Function not implemented");
+  // @ts-ignore
+  e.code = "ENOSYS";
+  return e;
+}
 
 export const argv = ["js"];
 export const argv0 = "js";

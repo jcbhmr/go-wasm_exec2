@@ -4,32 +4,19 @@ import { setTimeout, clearTimeout } from "./tinytimeout.js";
 import cryptoGetRandomValues from "./tinycrypto.getrandomvalues.js";
 import PromiseWithResolvers from "./tinypromise.withresolvers.js";
 
-declare global {
-  // @ts-ignore
-  var console:
-    | {
-        log: (...args: any[]) => void;
-        warn: (...args: any[]) => void;
-        error: (...args: any[]) => void;
-      }
-    | undefined;
-}
-
-export interface GoOptions {
-  import?:
-    | ((specifier: string, options?: ImportCallOptions) => Promise<any>)
-    | null
-    | undefined;
-  importMeta?: ImportMeta | null | undefined;
-  returnOnExit?: boolean | undefined;
-}
+/**
+ * @typedef {object} GoOptions
+ * @property {((specifier: string, options?: ImportCallOptions) => Promise<any>) | null | undefined} [import]
+ * @property {ImportMeta | null | undefined} [importMeta]
+ * @property {boolean | undefined} [returnOnExit]
+ */
 
 /**
  * Inspired by `node:wasi`.
  * @see https://nodejs.org/api/wasi.html
  */
 export class Go {
-  protected _import: (
+  _import: (
     specifier: string,
     options?: ImportCallOptions,
   ) => Promise<any>;
