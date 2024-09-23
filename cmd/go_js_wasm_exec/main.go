@@ -40,7 +40,6 @@ func main() {
 	default:
 		log.Fatalf("Unknown Go JavaScript runtime specified: %v", os.Getenv("GOJSRUNTIME"))
 	}
-
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -49,6 +48,6 @@ func main() {
 	if errors.As(err, &exitErr) {
 		os.Exit(exitErr.ExitCode())
 	} else if err != nil {
-		log.Fatalf("cmd.Run() %v: %v", cmd.String(), err)
+		log.Fatalf("cmd.Run() %v: %v", cmd, err)
 	}
 }

@@ -1,3 +1,29 @@
+// https://github.com/101arrowz/fflate
+
+/*!
+MIT License
+
+Copyright (c) 2023 Arjun Barrett
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 // DEFLATE is a complex format; to read this code, you should probably check the RFC first:
 // https://tools.ietf.org/html/rfc1951
 // You may also wish to take a look at the guide I made about this program:
@@ -395,3 +421,38 @@ export function gunzipSync(data, opts) {
     opts && opts.dictionary,
   );
 }
+
+// ADDED BY ME
+
+/** @param {Uint8Array} compressed */
+export async function myGunzip(compressed) {
+    if (globalThis.DecompressionStream) {
+        /** @type {Uint8Array[]} */
+      const chunks = [];
+      await new ReadableStream({
+        start(controller) {
+          controller.enqueue(compressed);
+          controller.close();
+        },
+      })
+        .pipeThrough(new DecompressionStream("gzip"))
+        .pipeTo(
+          new WritableStream({
+            write(chunk, controller) {
+              chunks.push(chunk);
+            },
+          }),
+        );
+      const result = new Uint8Array(
+        chunks.reduce((acc, chunk) => acc + chunk.length, 0),
+      );
+      let offset = 0;
+      for (const chunk of chunks) {
+        result.set(chunk, offset);
+        offset += chunk.byteLength;
+      }
+      return result;
+    } else {
+      return gunzipSync(compressed);
+    }
+  }

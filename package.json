@@ -1,18 +1,17 @@
 {
+  "name": "wasm_exec2",
+  "description": "🚚 A better WebAssembly runtime environment for JavaScript",
+  "version": "0.0.1",
+  "license": "MIT",
   "type": "module",
+  "bin": {
+    "go_js_wasm_exec": "./go_js_wasm_exec.js",
+    "mjslink": "./mjslink.js"
+  },
   "scripts": {
-    "format": "prettier -w .",
-    "build": "npm run build -w wasm_exec2 && npm run build -w gort0-js-wasm",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "format": "prettier -w ."
   },
   "devDependencies": {
-    "prettier": "^3.3.1",
-    "vitepress": "^1.2.3",
-    "vue": "^3.4.27"
-  },
-  "workspaces": [
-    "packages/*"
-  ]
+    "prettier": "^3.3.1"
+  }
 }

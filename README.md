@@ -1,3 +1,17 @@
-# wasm_exec2.js
+# wasm_exec2
 
-🚚 A better Go JavaScript WebAssembly runtime
+🚚 A better WebAssembly runtime environment for JavaScript
+
+<table align=center><td>
+
+</table>
+
+## Installation
+
+```sh
+npm install wasm_exec2
+```
+
+## Usage
+
+## Development
