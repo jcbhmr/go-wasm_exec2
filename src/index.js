@@ -12,8 +12,7 @@ import PromiseWithResolvers from "./tinypromise.withresolvers.js";
  */
 
 /**
- * Inspired by `node:wasi`.
- * @see https://nodejs.org/api/wasi.html
+ * Inspired by [`node:wasi`](https://nodejs.org/api/wasi.html).
  */
 export class Go {
   _import: (

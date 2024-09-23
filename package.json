@@ -1,15 +1,17 @@
 {
-  "name": "wasm_exec2",
+  "name": "go-wasm_exec2",
   "description": "🚚 A better WebAssembly runtime environment for JavaScript",
   "version": "0.0.1",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "go_js_wasm_exec": "./go_js_wasm_exec.js",
-    "mjslink": "./mjslink.js"
+    "go_js_wasm_exec": "./dist/go_js_wasm_exec.js",
+    "gojswasmlink": "./dist/gojswasmlink.js"
   },
   "scripts": {
-    "format": "prettier -w ."
+    "format": "go run task.go fmt",
+    "build": "go run task.go build",
+    "test": "go run task.go test"
   },
   "devDependencies": {
     "prettier": "^3.3.1"
